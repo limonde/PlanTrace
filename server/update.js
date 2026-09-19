@@ -94,7 +94,11 @@ export function selfUpdateCapable(projectDir) {
 
 function runCommand(cmd, args, cwd, send) {
   return new Promise((resolve, reject) => {
-    const child = spawn(cmd, args, { cwd, shell: false });
+    // npm is a .cmd shim on Windows; spawning it directly can fail with EINVAL.
+    const viaCmdShim = process.platform === 'win32' && cmd === 'npm';
+    const spawnCmd = viaCmdShim ? (process.env.ComSpec || 'cmd.exe') : cmd;
+    const spawnArgs = viaCmdShim ? ['/d', '/s', '/c', 'npm.cmd', ...args] : args;
+    const child = spawn(spawnCmd, spawnArgs, { cwd, shell: false, windowsHide: true });
     const relay = (data) => {
       const text = data.toString();
       for (const line of text.split('\n')) {

@@ -1,17 +1,22 @@
 {
-  "version": "1.3.0",
+  "version": "1.3.1",
   "releaseDate": "2026-09-19",
   "releaseNotes": [
-    "支持云服务器部署：新增生产服务器 server/index.js（静态托管 + API + SPA 路由回退）",
-    "新增 Docker 部署：Dockerfile + docker-compose（内置 Caddy 自动 HTTPS），数据持久化到 Docker 卷",
-    "公网安全加固：首次注册需初始化令牌、登录/注册按 IP 限流、HTTPS 下 Cookie 自动 Secure、安全响应头",
-    "多设备同步：同一账号多处登录，数据按条目 ID 自动合并，不再整份覆盖",
-    "页面重新聚焦时自动拉取服务端最新数据",
-    "一键更新适配云部署：非 git 部署提示服务器端更新命令，git 部署可选开启 PLANTRACE_SELF_UPDATE",
-    "合并上游 v1.2.0：包含 DIY 主题编辑器与石墨、极光、瓷白、松影、画廊、冰川等精选主题",
-    "新增 .env.example、deploy/Caddyfile、deploy/plantrace.service 与云部署文档 DEPLOY-CLOUD.md"
+    "多用户账号系统：登录/注册、管理员后台、数据按账号隔离（data/<用户>/）",
+    "支持云服务器部署：Docker Compose + Caddy 自动 HTTPS、生产服务器与安全加固",
+    "手机端 UI 适配：顶部日期条、单列布局、触屏操作优化、主题面板底部抽屉",
+    "同步上游 v1.2.1：修复 Windows 一键更新 spawn EINVAL、下载通道自动切换、下载进度回传、慢网络提示"
   ],
   "history": [
+    {
+      "version": "1.2.1",
+      "releaseDate": "2026-09-19",
+      "releaseNotes": [
+        "修复 Windows 下软件内一键更新在安装依赖阶段可能出现 spawn EINVAL 的问题",
+        "优化 GitHub 下载通道，增加 codeload 优先、无响应自动切换备用通道",
+        "更新弹窗增加慢网络提示和下载进度回传"
+      ]
+    },
     {
       "version": "1.2.0",
       "releaseDate": "2026-09-19",
