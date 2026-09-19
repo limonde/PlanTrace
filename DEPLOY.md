@@ -18,6 +18,9 @@
 - `start.bat`
 - `Install-PlanTrace-From-GitHub.bat`
 - `Update-PlanTrace.bat`
+- `start-macOS.command`
+- `Install-PlanTrace-From-GitHub-macOS.command`
+- `Update-PlanTrace-macOS.command`
 - `scripts/`
 - `src/version.js`
 - `public/version.json`

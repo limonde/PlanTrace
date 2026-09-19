@@ -126,19 +126,14 @@ async function downloadFirstAvailable(urls, destPath, send) {
 /** Run npm install, streaming stdout/stderr lines back via send(). */
 function runNpmInstall(cwd, send) {
   return new Promise((resolve, reject) => {
-    const npm = spawn(process.env.ComSpec || 'cmd.exe', [
-      '/d',
-      '/s',
-      '/c',
-      'npm.cmd',
-      'install',
-      '--prefer-offline',
-      '--loglevel',
-      'warn',
-    ], {
-      cwd,
-      windowsHide: true,
-    });
+    // Windows needs cmd.exe + npm.cmd (spawning npm.cmd directly fails with EINVAL);
+    // macOS / Linux run the npm shim directly.
+    const isWindows = process.platform === 'win32';
+    const npm = isWindows
+      ? spawn(process.env.ComSpec || 'cmd.exe', [
+          '/d', '/s', '/c', 'npm.cmd', 'install', '--prefer-offline', '--loglevel', 'warn',
+        ], { cwd, windowsHide: true })
+      : spawn('npm', ['install', '--prefer-offline', '--loglevel', 'warn'], { cwd });
     npm.stdout.on('data', (d) => {
       const line = d.toString().trim();
       if (line) send({ type: 'progress', message: line });
@@ -233,10 +228,16 @@ function updatePlugin() {
 
           // ── Step 2: Extract ──
           send({ type: 'step', step: 2, message: '正在解压...' });
-          execSync(
-            `powershell -NoProfile -Command "Expand-Archive -Path '${zipPath}' -DestinationPath '${extractDir}' -Force"`,
-            { timeout: 60000 }
-          );
+          if (process.platform === 'win32') {
+            execSync(
+              `powershell -NoProfile -Command "Expand-Archive -Path '${zipPath}' -DestinationPath '${extractDir}' -Force"`,
+              { timeout: 60000 }
+            );
+          } else if (process.platform === 'darwin') {
+            execSync(`ditto -x -k "${zipPath}" "${extractDir}"`, { timeout: 60000 });
+          } else {
+            execSync(`unzip -q -o "${zipPath}" -d "${extractDir}"`, { timeout: 60000 });
+          }
           send({ type: 'progress', message: '解压完成 ✓' });
 
           // Find the inner folder (PlanTrace-main)
@@ -282,6 +283,9 @@ function updatePlugin() {
             'start.bat',
             'Install-PlanTrace-From-GitHub.bat',
             'Update-PlanTrace.bat',
+            'start-macOS.command',
+            'Update-PlanTrace-macOS.command',
+            'Install-PlanTrace-From-GitHub-macOS.command',
             'README.md',
             'DEPLOY.md',
             'DEPLOY-CLOUD.md',

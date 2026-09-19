@@ -1,13 +1,23 @@
 {
-  "version": "1.3.1",
+  "version": "1.4.0",
   "releaseDate": "2026-09-19",
   "releaseNotes": [
-    "多用户账号系统：登录/注册、管理员后台、数据按账号隔离（data/<用户>/）",
-    "支持云服务器部署：Docker Compose + Caddy 自动 HTTPS、生产服务器与安全加固",
-    "手机端 UI 适配：顶部日期条、单列布局、触屏操作优化、主题面板底部抽屉",
-    "同步上游 v1.2.1：修复 Windows 一键更新 spawn EINVAL、下载通道自动切换、下载进度回传、慢网络提示"
+    "新增 macOS 一键脚本：安装 / 启动 / 更新三个 .command 入口，支持双击运行",
+    "macOS 自动检测 Node.js（优先 Homebrew 安装）、创建桌面启动器",
+    "应用内一键更新兼容 macOS（ditto 解压、npm 直连），Windows 流程保持不变",
+    "安装/更新脚本自动保留 data/、backups/、.env"
   ],
   "history": [
+    {
+      "version": "1.3.1",
+      "releaseDate": "2026-09-19",
+      "releaseNotes": [
+        "多用户账号系统：登录/注册、管理员后台、数据按账号隔离（data/<用户>/）",
+        "支持云服务器部署：Docker Compose + Caddy 自动 HTTPS、生产服务器与安全加固",
+        "手机端 UI 适配：顶部日期条、单列布局、触屏操作优化、主题面板底部抽屉",
+        "同步上游 v1.2.1：修复 Windows 一键更新 spawn EINVAL、下载通道自动切换、下载进度回传、慢网络提示"
+      ]
+    },
     {
       "version": "1.2.1",
       "releaseDate": "2026-09-19",

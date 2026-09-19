@@ -6,13 +6,13 @@
 >
 > 本仓库（[limonde/PlanTrace](https://github.com/limonde/PlanTrace)）在原版基础上新增 **多用户账号、云服务器部署与手机端适配**。
 
-![version](https://img.shields.io/badge/版本-v1.3.1-blueviolet)
+![version](https://img.shields.io/badge/版本-v1.4.0-blueviolet)
 ![deploy](https://img.shields.io/badge/部署-Docker_·_云服务器-2496ed)
 ![react](https://img.shields.io/badge/React-19-61dafb)
 ![vite](https://img.shields.io/badge/Vite-7-646cff)
 ![tailwind](https://img.shields.io/badge/Tailwind_CSS-v4-06b6d4)
 ![license](https://img.shields.io/badge/License-NonCommercial-red)
-![platform](https://img.shields.io/badge/Platform-Windows_·_手机浏览器-0078d4)
+![platform](https://img.shields.io/badge/Platform-Windows_·_macOS_·_手机浏览器-0078d4)
 
 ---
 
@@ -135,7 +135,7 @@
 
 ## 🚀 安装与启动
 
-### 方式一：一键安装（推荐新用户）
+### 方式一：Windows 一键安装（推荐新用户）
 
 双击 `Install-PlanTrace-From-GitHub.bat`
 
@@ -169,11 +169,25 @@ npm run dev
 
 ---
 
-### 方式三：双击启动（已安装用户）
+### 方式三：双击启动（Windows 已安装用户）
 
 双击项目根目录的 **`start.bat`** 或桌面 **PlanTrace 图标**
 
 ---
+
+### 方式四：macOS 一键脚本
+
+| 双击文件 | 用途 |
+|---------|------|
+| `Install-PlanTrace-From-GitHub-macOS.command` | 首次安装（装到 `~/Library/Application Support/PlanTrace`，创建桌面启动器，自动启动） |
+| `start-macOS.command` | 日常启动（自动打开浏览器 http://localhost:5173） |
+| `Update-PlanTrace-macOS.command` | 更新（自动保留 `data/`、`backups/`、`.env`） |
+
+脚本会自动完成：检测 Node.js（未安装则用 **Homebrew** 安装，无 Homebrew 时打开官网引导）→ 从 GitHub 下载源码 → `npm install` → 创建桌面 `PlanTrace.command` 启动器。
+
+> [!NOTE]
+> 首次双击若被 macOS 拦截（未验证的开发者），请 **右键 → 打开** 一次；或在终端执行 `xattr -dr com.apple.quarantine <项目目录>` 解除隔离。
+> 脚本只依赖 macOS 自带的 `curl` / `ditto` / `unzip`，无需安装 Xcode 命令行工具。
 
 ---
 
@@ -197,8 +211,9 @@ docker compose logs plantrace       # 查看首次注册所需的初始化令牌
 
 | 方式 | 适用场景 |
 |------|---------|
-| 应用内 `↻` 图标 → 一键更新（管理员） | 应用正在运行，最方便 |
-| 双击 `Update-PlanTrace.bat` | 应用未运行，命令行更新 |
+| 应用内 `↻` 图标 → 一键更新（管理员） | 应用正在运行，最方便（Windows / macOS 均支持） |
+| 双击 `Update-PlanTrace.bat` | Windows，应用未运行 |
+| 双击 `Update-PlanTrace-macOS.command` | macOS，应用未运行 |
 | `git pull && npm install && npm run build` | 云服务器 / 裸机部署 |
 | `git pull && docker compose up -d --build` | Docker 部署 |
 
@@ -295,9 +310,12 @@ PlanTrace/
 ├── docker-compose.yml          # 应用 + Caddy 自动 HTTPS
 ├── data/                       # 账号与业务数据（自动创建，勿提交）
 ├── backups/                    # 导出的 JSON 备份（按账号分目录，自动创建）
-├── Install-PlanTrace-From-GitHub.bat   # 一键安装
-├── Update-PlanTrace.bat                # 一键更新
-├── start.bat                           # 日常启动
+├── Install-PlanTrace-From-GitHub.bat   # Windows 一键安装
+├── Update-PlanTrace.bat                # Windows 一键更新
+├── start.bat                           # Windows 日常启动
+├── Install-PlanTrace-From-GitHub-macOS.command  # macOS 一键安装
+├── Update-PlanTrace-macOS.command               # macOS 一键更新
+├── start-macOS.command                          # macOS 日常启动
 └── src/
     ├── version.js              # 本地版本常量
     ├── App.jsx                 # 根组件 & 路由 & 状态管理
