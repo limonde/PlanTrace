@@ -1,16 +1,18 @@
 # PlanTrace ✦ 个人任务 · 日记 · 时间追踪
 
-> 一款基于事件溯源架构的精美本地任务管理应用，集成原子时钟、日记、周日程可视化。
+> 一款基于事件溯源架构的精美任务管理应用，集成原子时钟、日记、周日程可视化、3D 星图。
 >
-> A beautiful local-first task manager with atomic timer, diary, and weekly schedule visualization.
+> A beautiful task manager with atomic timer, diary, weekly schedule visualization and multi-user accounts.
+>
+> 本仓库（[limonde/PlanTrace](https://github.com/limonde/PlanTrace)）在原版基础上新增 **多用户账号、云服务器部署与手机端适配**。
 
-![version](https://img.shields.io/badge/版本-v1.3.0-blueviolet)
+![version](https://img.shields.io/badge/版本-v1.3.1-blueviolet)
 ![deploy](https://img.shields.io/badge/部署-Docker_·_云服务器-2496ed)
 ![react](https://img.shields.io/badge/React-19-61dafb)
 ![vite](https://img.shields.io/badge/Vite-7-646cff)
 ![tailwind](https://img.shields.io/badge/Tailwind_CSS-v4-06b6d4)
 ![license](https://img.shields.io/badge/License-NonCommercial-red)
-![platform](https://img.shields.io/badge/Platform-Windows-0078d4)
+![platform](https://img.shields.io/badge/Platform-Windows_·_手机浏览器-0078d4)
 
 ---
 
@@ -18,9 +20,11 @@
 
 | 主界面 | TraceStar 星图 |
 |--------|---------------|
-| ![主界面](static/1.png) | ![TraceStar](static/2.png) |
+| ![主界面](static/main.png) | ![TraceStar](static/tracestar.png) |
 
-![周日程视图](static/3.png)
+| 周日程视图 | 手机端 |
+|-----------|--------|
+| ![周日程](static/weekview.png) | ![手机端](static/mobile.png) |
 
 ---
 
@@ -81,6 +85,27 @@
 
 3D 星空可视化，每颗星代表一个任务的投入历史——任务越活跃，星越亮。
 
+### 🎨 主题与 DIY
+
+```
+主题系统
+├── 内置 8+ 套精选主题（晨雾 / 星空 / 晚霞 / 石墨 / 极光 / 瓷白 / 松影 / 画廊 / 冰川）
+├── DIY 编辑器：自定义背景、面板、文字、主色与状态色
+├── 全局联动换肤（任务、时钟、3D 星图、弹窗）
+└── 个人主题按账号保存在服务端
+```
+
+### 📱 手机端适配
+
+```
+移动端
+├── 响应式布局：侧边栏变为顶部横向日期条，任务与原子时钟单列排列
+├── 触屏优化：任务操作按钮常显、输入框 16px 防 iOS 自动缩放
+├── 主题面板改为底部抽屉，周日程日期列横向滚动
+├── 登录页 / 用户管理 / 日记 / 3D 星图全适配
+└── 适配 iPhone 安全区与浏览器动态地址栏
+```
+
 ### 👤 多用户账号
 
 ```
@@ -98,10 +123,11 @@
 ```
 更新机制
 ├── 启动后1秒自动静默检查（5秒超时，不阻塞使用）
-├── 24小时内只检查一次
-├── 发现新版本 → 弹出更新卡片（版本对比 + 更新内容）
-├── 一键更新：自动下载、解压、替换代码文件、npm install
-│   全程实时进度日志展示
+├── 发现新版本 → 弹出更新卡片（版本对比 + 更新历史）
+├── 下载通道 codeload 优先，无响应自动切换备用通道，进度实时回传
+├── 一键更新：下载、解压、替换代码、npm install（仅管理员可执行）
+│   全程进度日志 + 45 秒慢网络提示
+├── 云部署：服务器端更新；git 检出可开启 PLANTRACE_SELF_UPDATE 应用内更新
 └── 可跳过指定版本（永不再提示该版本）
 ```
 
@@ -165,15 +191,18 @@ docker compose logs plantrace       # 查看首次注册所需的初始化令牌
 - 完整步骤（Docker / 裸机 systemd / Nginx / 环境变量 / 安全清单）见 **[DEPLOY-CLOUD.md](DEPLOY-CLOUD.md)**
 - 公网安全：首次注册需初始化令牌、登录限流、HTTPS 下 Cookie Secure、数据目录不对外暴露
 - 多设备：同一账号多处登录时按条目 ID 合并数据，页面重新聚焦会自动拉取最新版本
+- 手机访问：部署后直接用手机浏览器打开站点即可（已做完整移动端适配，无需安装 App）
 
 ## 🔄 更新
 
 | 方式 | 适用场景 |
 |------|---------|
-| 应用内 `↻` 图标 → 一键更新 | 应用正在运行，最方便 |
+| 应用内 `↻` 图标 → 一键更新（管理员） | 应用正在运行，最方便 |
 | 双击 `Update-PlanTrace.bat` | 应用未运行，命令行更新 |
+| `git pull && npm install && npm run build` | 云服务器 / 裸机部署 |
+| `git pull && docker compose up -d --build` | Docker 部署 |
 
-两种方式均**自动保护用户数据**，不触碰 `backups/`、`start.bat` 及浏览器 localStorage。
+所有方式均**自动保护用户数据**，不触碰 `data/`、`backups/`、`start.bat` 及浏览器数据。
 
 ---
 
@@ -186,15 +215,18 @@ data/
 ├── users.json                # 账号（scrypt 加盐哈希密码）
 ├── sessions.json             # 登录会话（HttpOnly Cookie）
 ├── settings.json             # 注册开关
+├── setup-token.txt           # 首次注册管理员的初始化令牌
 └── users/<用户ID>/
     ├── tasks.json            # 任务
     ├── action_logs.json      # 动作日志
     ├── atomic_sessions.json  # 原子专注记录
-    └── prefs.json            # 主题、弹窗偏好等
+    ├── prefs.json            # 主题、DIY 主题、弹窗偏好等
+    └── revisions.json        # 各集合版本号（多设备合并用）
 ```
 
 > [!NOTE]
-> 前端仍以原有同步 API 读写数据：登录后一次性载入内存缓存，改动以 500ms 防抖写回服务端；页面关闭时用 sendBeacon 兜底同步。
+> 前端以同步 API 读写数据：登录后一次性载入内存缓存，改动以 500ms 防抖写回服务端；页面关闭时用 sendBeacon 兜底同步。
+> 同一账号多设备同时编辑时，服务端按条目 ID 合并（同一账号在两台设备上都能看到彼此的改动），并在页面重新聚焦时自动刷新。
 
 任务与日志严格分离为两个集合：
 
@@ -269,21 +301,23 @@ PlanTrace/
 └── src/
     ├── version.js              # 本地版本常量
     ├── App.jsx                 # 根组件 & 路由 & 状态管理
-    ├── index.css               # 设计系统（毛玻璃、渐变、动画）
+    ├── index.css               # 设计系统（毛玻璃、渐变、动画、移动端媒体查询）
+    ├── theme/                  # 主题系统（内置主题、DIY 预设、自定义主题存储）
     ├── pages/
     │   ├── AdminPanel.jsx      # 用户管理后台（仅管理员）
     │   └── TraceStar/          # 3D 星图
     ├── store/
     │   ├── dateUtils.js        # 北京时间工具函数
-    │   ├── storage.js          # LocalStorage 封装 + 导出备份
+    │   ├── storage.js          # 按账号内存缓存 + 服务端同步（合并写回）+ 备份导出
     │   ├── taskStore.js        # 任务 CRUD（每次操作追加 ActionLog）
     │   ├── actionLogStore.js   # 只追加的不可变日志
     │   ├── atomicStore.js      # 原子专注记录
     │   ├── authStore.js        # 账号 API + 登录后数据加载
     │   ├── diaryStore.js       # 日记 File System Access API 封装（按账号隔离）
-    │   └── versionStore.js     # 版本检测（远端拉取 + 超时 + 冷却）
+    │   └── versionStore.js     # 版本检测（远端拉取 + 超时 + 跳过版本）
     └── components/
-        ├── AuthContext.jsx     # 登录状态上下文
+        ├── AuthContext.jsx     # 登录状态 Provider
+        ├── authContext.js      # 上下文与 useAuth Hook
         ├── AuthGate.jsx        # 未登录拦截 + 启动画面
         ├── LoginScreen.jsx     # 登录 / 注册页
         ├── Sidebar.jsx         # 日期卡片、状态点、导航
@@ -296,8 +330,8 @@ PlanTrace/
         ├── UpdateModal.jsx     # 版本更新弹窗（含一键更新进度）
         ├── RolloverModal.jsx   # 跨日继承选择弹窗
         ├── PlanFutureModal.jsx # 规划未来日期弹窗
-        ├── ThemeSwitcher.jsx   # 主题切换
-        └── ThemeContext.jsx    # 全局主题上下文
+        ├── ThemeSwitcher.jsx   # 主题切换 + DIY 编辑器
+        └── ThemeContext.jsx    # 全局主题 Provider
 ```
 
 ---
@@ -305,8 +339,9 @@ PlanTrace/
 ## 🎨 设计风格
 
 - **毛玻璃 Glassmorphism** — `backdrop-blur` + 半透明边框卡片
-- **多套主题** — 深色/浅色/紫/蓝等，一键切换，全局一致
+- **多套主题 + DIY** — 内置 8+ 套，支持自定义配色，一键全局换肤
 - **微动效** — 按钮 hover、Hammer 抖动、弹窗弹入、时钟指针流畅旋转
+- **响应式** — 桌面双栏 / 手机顶部日期条 + 单列布局，触屏操作优化
 - **状态光点**（侧边栏日期卡）：
   - 🟢 绿 = 当日全部完成
   - 🔵 蓝 = 有待办中任务
@@ -321,6 +356,7 @@ PlanTrace/
 | 框架 | React 19 |
 | 构建 | Vite 7 |
 | 样式 | Tailwind CSS v4 + Vanilla CSS |
+| 移动端 | 响应式 CSS 媒体查询 + 触屏/安全区适配 |
 | 图标 | Lucide React |
 | 3D | Three.js + @react-three/fiber |
 | 动效 | Framer Motion |
@@ -359,7 +395,9 @@ PlanTrace/
 | 在注明来源的前提下分享 | 抄袭代码并声称是自己的原创作品 |
 | 衍生作品（须保留许可、注明出处） | 去除版权声明或来源链接 |
 
-> 商业授权请通过 GitHub 联系作者。
+> 商业授权请通过 GitHub 联系原作者。
+
+本仓库 [limonde/PlanTrace](https://github.com/limonde/PlanTrace) 是基于原作者项目的衍生版本，遵循同一许可协议，保留原作者版权与仓库链接。
 
 © 2026 [EmoLorry](https://github.com/EmoLorry) · [查看完整许可协议](LICENSE)
 
