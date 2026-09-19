@@ -62,19 +62,24 @@ async function idbDel(key) {
 // Directory handle persistence
 // ---------------------------------------------------------------------------
 
+/** Each account gets its own directory handle so diaries never mix. */
+function dirKey(userId) {
+    return `diary-dir:${userId || 'anonymous'}`;
+}
+
 /** Retrieve the previously-saved directory handle (may be null). */
-export async function getSavedDirHandle() {
-    return idbGet('diary-dir');
+export async function getSavedDirHandle(userId) {
+    return idbGet(dirKey(userId));
 }
 
 /** Persist a directory handle for future sessions. */
-export async function saveDirHandle(handle) {
-    return idbSet('diary-dir', handle);
+export async function saveDirHandle(userId, handle) {
+    return idbSet(dirKey(userId), handle);
 }
 
 /** Forget the saved handle (user wants to change folder). */
-export async function clearDirHandle() {
-    return idbDel('diary-dir');
+export async function clearDirHandle(userId) {
+    return idbDel(dirKey(userId));
 }
 
 // ---------------------------------------------------------------------------
@@ -103,13 +108,17 @@ export async function verifyPermission(handle) {
 
 /**
  * Prompt user to pick a local folder.
+ * A per-account subfolder (PlanTrace-<username>) is created inside it so
+ * multiple accounts can even share one parent folder safely.
  * Saves the handle to IndexedDB on success.
  * Returns the handle, or null if cancelled.
  */
-export async function pickDirectory() {
+export async function pickDirectory(userId, username) {
     try {
-        const handle = await window.showDirectoryPicker({ mode: 'readwrite' });
-        await saveDirHandle(handle);
+        const root = await window.showDirectoryPicker({ mode: 'readwrite' });
+        const safeName = String(username || 'user').replace(/[\\/:*?"<>|]/g, '_');
+        const handle = await root.getDirectoryHandle(`PlanTrace-${safeName}`, { create: true });
+        await saveDirHandle(userId, handle);
         return handle;
     } catch (e) {
         if (e.name === 'AbortError') return null;

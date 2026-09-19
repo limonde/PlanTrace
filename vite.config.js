@@ -7,38 +7,9 @@ import os from 'os'
 import https from 'https'
 import http from 'http'
 import { execSync, spawn } from 'child_process'
-
-// ---------------------------------------------------------------------------
-// Plugin: backup endpoint
-// ---------------------------------------------------------------------------
-function backupPlugin() {
-  return {
-    name: 'plantrace-backup',
-    configureServer(server) {
-      server.middlewares.use('/api/backup', (req, res) => {
-        if (req.method !== 'POST') {
-          res.statusCode = 405; res.end('Method not allowed'); return;
-        }
-        let body = '';
-        req.on('data', (chunk) => { body += chunk; });
-        req.on('end', () => {
-          try {
-            const { filename, data } = JSON.parse(body);
-            const backupDir = path.resolve('backups');
-            if (!fs.existsSync(backupDir)) fs.mkdirSync(backupDir, { recursive: true });
-            const filePath = path.join(backupDir, filename);
-            fs.writeFileSync(filePath, data, 'utf-8');
-            res.setHeader('Content-Type', 'application/json');
-            res.end(JSON.stringify({ success: true, path: filePath }));
-          } catch (err) {
-            res.statusCode = 500;
-            res.end(JSON.stringify({ error: err.message }));
-          }
-        });
-      });
-    },
-  };
-}
+import { apiPlugin } from './server/apiPlugin.js'
+import { getSessionUser, publicUser } from './server/auth.js'
+import { fetchRemoteVersionManifest } from './server/update.js'
 
 // ---------------------------------------------------------------------------
 // Plugin: auto-update endpoint
@@ -93,69 +64,6 @@ async function downloadFirstAvailable(urls, destPath) {
     }
   }
   throw new Error(`All download mirrors failed. ${errors.join(' | ')}`);
-}
-
-/** Follow HTTP/HTTPS redirects and read a URL as text. */
-function getText(url, timeoutMs = 10000) {
-  return new Promise((resolve, reject) => {
-    const fetch = (u) => {
-      const mod = u.startsWith('https') ? https : http;
-      const req = mod.get(u, { headers: { 'User-Agent': 'PlanTrace-Updater/1.0' } }, (res) => {
-        if (res.statusCode >= 300 && res.statusCode < 400 && res.headers.location) {
-          fetch(new URL(res.headers.location, u).toString());
-          return;
-        }
-        if (res.statusCode !== 200) {
-          reject(new Error(`HTTP ${res.statusCode} while reading ${u}`));
-          return;
-        }
-
-        let body = '';
-        res.setEncoding('utf8');
-        res.on('data', (chunk) => { body += chunk; });
-        res.on('end', () => resolve(body));
-      });
-      req.setTimeout(timeoutMs, () => req.destroy(new Error(`Timeout while reading ${u}`)));
-      req.on('error', reject);
-    };
-    fetch(url);
-  });
-}
-
-async function fetchRemoteVersionManifest() {
-  const cacheBust = `t=${Date.now()}`;
-  const sources = [
-    {
-      kind: 'json',
-      url: `https://raw.githubusercontent.com/EmoLorry/PlanTrace/main/public/version.json?${cacheBust}`,
-    },
-    {
-      kind: 'json',
-      url: `https://cdn.jsdelivr.net/gh/EmoLorry/PlanTrace@main/public/version.json?${cacheBust}`,
-    },
-    {
-      kind: 'github-content',
-      url: `https://api.github.com/repos/EmoLorry/PlanTrace/contents/public/version.json?ref=main&${cacheBust}`,
-    },
-  ];
-
-  const errors = [];
-  for (const source of sources) {
-    try {
-      const text = await getText(source.url);
-      if (source.kind === 'github-content') {
-        const payload = JSON.parse(text);
-        const content = String(payload.content || '').replace(/\s/g, '');
-        const decoded = Buffer.from(content, 'base64').toString('utf8');
-        return JSON.parse(decoded);
-      }
-      return JSON.parse(text);
-    } catch (err) {
-      errors.push(`${source.kind}: ${err.message}`);
-    }
-  }
-
-  throw new Error(`Could not fetch remote version manifest. ${errors.join(' | ')}`);
 }
 
 /** Run npm install, streaming stdout/stderr lines back via send(). */
@@ -215,16 +123,27 @@ function updatePlugin() {
       server.middlewares.use('/api/update/apply', async (req, res) => {
         if (req.method !== 'POST') { res.statusCode = 405; res.end(); return; }
 
+        // Only administrators may update the shared installation.
+        const user = getSessionUser(req);
+        if (!user || user.role !== 'admin') {
+          res.statusCode = user ? 403 : 401;
+          res.setHeader('Content-Type', 'application/json; charset=utf-8');
+          res.end(JSON.stringify({ error: user ? '仅管理员可执行更新' : '未登录' }));
+          return;
+        }
+        const operator = publicUser(user);
+
         // SSE headers
         res.setHeader('Content-Type', 'text/event-stream');
         res.setHeader('Cache-Control', 'no-cache');
         res.setHeader('Connection', 'keep-alive');
-        res.setHeader('Access-Control-Allow-Origin', '*');
 
         // Helper: send a structured SSE message
         const send = (payload) => {
           try { res.write(`data: ${JSON.stringify(payload)}\n\n`); } catch { /* closed */ }
         };
+
+        send({ type: 'progress', message: `操作者: ${operator.username}` });
 
         const projectDir = path.resolve('.');
         const tmpDir = path.join(os.tmpdir(), `plantrace-update-${Date.now()}`);
@@ -262,7 +181,7 @@ function updatePlugin() {
           send({ type: 'step', step: 3, message: '正在应用更新（不会覆盖用户数据）...' });
 
           // Directories to replace entirely
-          const DIRS = ['src', 'public'];
+          const DIRS = ['src', 'public', 'server'];
           for (const dir of DIRS) {
             const src = path.join(sourceRoot, dir);
             const dest = path.join(projectDir, dir);
@@ -275,7 +194,7 @@ function updatePlugin() {
           }
 
           // Directories to merge, not replace. This keeps locally-added helper files.
-          const MERGE_DIRS = ['scripts'];
+          const MERGE_DIRS = ['scripts', 'deploy'];
           for (const dir of MERGE_DIRS) {
             const src = path.join(sourceRoot, dir);
             const dest = path.join(projectDir, dir);
@@ -285,7 +204,7 @@ function updatePlugin() {
             }
           }
 
-          // Individual files to update (never touch: backups/, .gitignore)
+          // Individual files to update (never touch: backups/, data/)
           const FILES = [
             'index.html',
             'package.json',
@@ -298,7 +217,13 @@ function updatePlugin() {
             'Update-PlanTrace.bat',
             'README.md',
             'DEPLOY.md',
+            'DEPLOY-CLOUD.md',
+            'Dockerfile',
+            'docker-compose.yml',
+            '.dockerignore',
+            '.env.example',
             'LICENSE',
+            '.gitignore',
           ];
           for (const file of FILES) {
             const src = path.join(sourceRoot, file);
@@ -339,5 +264,5 @@ export default defineConfig({
     port: 5173,
     open: 'http://localhost:5173',
   },
-  plugins: [react(), tailwindcss(), backupPlugin(), updatePlugin()],
+  plugins: [react(), tailwindcss(), apiPlugin(), updatePlugin()],
 })

@@ -1,0 +1,24 @@
+# 裸机部署示例：将本项目放在 /opt/plantrace，使用 systemd 运行
+# sudo cp deploy/plantrace.service /etc/systemd/system/
+# sudo systemctl daemon-reload && sudo systemctl enable --now plantrace
+
+[Unit]
+Description=PlanTrace server
+After=network.target
+
+[Service]
+Type=simple
+WorkingDirectory=/opt/plantrace
+Environment=NODE_ENV=production
+Environment=PLANTRACE_PORT=3000
+Environment=PLANTRACE_HOST=127.0.0.1
+Environment=PLANTRACE_TRUST_PROXY=1
+ExecStart=/usr/bin/node server/index.js
+Restart=always
+RestartSec=3
+# 建议使用专用用户，并确保其拥有 /opt/plantrace/data 与 backups 的写权限
+User=plantrace
+Group=plantrace
+
+[Install]
+WantedBy=multi-user.target

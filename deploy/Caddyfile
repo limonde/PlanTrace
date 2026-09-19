@@ -1,0 +1,6 @@
+# PlanTrace — 自动 HTTPS 反向代理
+# DOMAIN 来自 docker-compose 环境变量；Caddy 自动申请并续期 Let's Encrypt 证书
+{$DOMAIN} {
+	encode gzip
+	reverse_proxy plantrace:3000
+}

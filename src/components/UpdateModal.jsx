@@ -1,6 +1,7 @@
 import { useState, useRef } from 'react';
 import { X, Download, RefreshCw, ChevronRight, Sparkles, CheckCircle2, AlertCircle, Loader } from 'lucide-react';
 import { APP_VERSION, dismissVersion } from '../store/versionStore.js';
+import { useAuth } from './AuthContext.jsx';
 
 /**
  * UpdateModal
@@ -11,6 +12,7 @@ import { APP_VERSION, dismissVersion } from '../store/versionStore.js';
  *   isManual  — opened by the toolbar button (hide "跳过" option)
  */
 export default function UpdateModal({ manifest, onClose, onSkip, isManual = false }) {
+    const { isAdmin } = useAuth();
     const [phase, setPhase]       = useState('idle'); // idle | updating | done | error
     const [progress, setProgress] = useState([]);
     const [currentStep, setCurrentStep] = useState('');
@@ -19,6 +21,7 @@ export default function UpdateModal({ manifest, onClose, onSkip, isManual = fals
     if (!manifest) return null;
 
     const { version, releaseDate, releaseNotes = [] } = manifest;
+    const canSelfUpdate = manifest.selfUpdate !== false;
 
     // ── Helpers ──────────────────────────────────────────────────────────────
 
@@ -226,16 +229,32 @@ export default function UpdateModal({ manifest, onClose, onSkip, isManual = fals
                     )}
                     <div style={{ flex: 1 }} />
                     <button className="upd-btn-later" onClick={onClose}>稍后再说</button>
-                    <button className="upd-btn-download" onClick={handleAutoUpdate} title="下载并应用最新版本">
-                        <Download size={14} />
-                        一键更新
-                    </button>
+                    {!canSelfUpdate ? (
+                        <button className="upd-btn-download" disabled title="请在服务器上更新">
+                            <Download size={14} />
+                            服务器端更新
+                        </button>
+                    ) : isAdmin ? (
+                        <button className="upd-btn-download" onClick={handleAutoUpdate} title="下载并应用最新版本">
+                            <Download size={14} />
+                            一键更新
+                        </button>
+                    ) : (
+                        <button className="upd-btn-download" disabled title="仅管理员可执行更新">
+                            <Download size={14} />
+                            仅管理员可更新
+                        </button>
+                    )}
                 </div>
 
                 {/* Hint */}
                 <div className="upd-hint">
                     <RefreshCw size={10} />
-                    点击「一键更新」将自动下载并应用新版本，用户数据不受影响
+                    {!canSelfUpdate
+                        ? '当前为服务器部署，请在服务器执行更新（docker compose pull && docker compose up -d --build，或 git pull && npm install && npm run build）'
+                        : isAdmin
+                            ? '点击「一键更新」将自动下载并应用新版本，账号数据不受影响'
+                            : '更新由管理员执行；账号数据不受影响'}
                 </div>
             </div>
         </div>

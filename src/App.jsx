@@ -1,9 +1,11 @@
 import { useState, useEffect, useCallback } from 'react';
 import { BrowserRouter, Routes, Route, useNavigate } from 'react-router-dom';
-import { ThemeProvider } from './components/ThemeContext.jsx';
+import { AuthProvider, useAuth } from './components/AuthContext.jsx';
+import AuthGate from './components/AuthGate.jsx';
+import AdminPanel from './pages/AdminPanel.jsx';
 import ThemeSwitcher from './components/ThemeSwitcher.jsx';
 import TraceStar from './pages/TraceStar/ThreeDTraceView.jsx';
-import { Sparkles, Star, BookOpen, CalendarDays, RefreshCw } from 'lucide-react';
+import { Sparkles, Star, BookOpen, CalendarDays, RefreshCw, Users, LogOut, ShieldCheck } from 'lucide-react';
 import Sidebar from './components/Sidebar.jsx';
 import Toolbar from './components/Toolbar.jsx';
 import TaskList from './components/TaskList.jsx';
@@ -33,6 +35,7 @@ const ROLLOVER_DISMISS_KEY = 'rollover_dismissed';
 
 function AppContent() {
   const navigate = useNavigate();
+  const { user, isAdmin, logout } = useAuth();
   const todayStr = getTodayBJ();
   const [selectedDate, setSelectedDate] = useState(todayStr);
   const [tasks, setTasks] = useState([]);
@@ -73,6 +76,12 @@ function AppContent() {
   const refresh = useCallback(() => {
     setRefreshKey((k) => k + 1);
   }, []);
+
+  // Data refreshed in the background (another device changed this account)
+  useEffect(() => {
+    window.addEventListener('plantrace:data-refreshed', refresh);
+    return () => window.removeEventListener('plantrace:data-refreshed', refresh);
+  }, [refresh]);
 
   useEffect(() => {
     setTasks(getTasksForDate(selectedDate));
@@ -133,6 +142,11 @@ function AppContent() {
     setSelectedDate(dateStr);
     navigate('/');
   }, [navigate]);
+
+  const handleLogout = useCallback(async () => {
+    if (!window.confirm('确定退出登录吗？')) return;
+    await logout();
+  }, [logout]);
 
   return (
     <Routes>
@@ -195,6 +209,30 @@ function AppContent() {
                 <Sparkles size={18} />
               </button>
               <ThemeSwitcher />
+
+              <div className="app-user-divider" />
+              <span className="app-user-chip" title={isAdmin ? '管理员账号' : '普通账号'}>
+                {isAdmin && <ShieldCheck size={12} />}
+                {user.username}
+              </span>
+              {isAdmin && (
+                <button
+                  onClick={() => navigate('/admin')}
+                  className="p-2 rounded-xl hover:bg-[var(--th-hover)] transition-all text-text-muted hover:text-violet-400"
+                  title="用户管理"
+                  aria-label="用户管理"
+                >
+                  <Users size={18} />
+                </button>
+              )}
+              <button
+                onClick={handleLogout}
+                className="p-2 rounded-xl hover:bg-[var(--th-hover)] transition-all text-text-muted hover:text-rose-400"
+                title="退出登录"
+                aria-label="退出登录"
+              >
+                <LogOut size={18} />
+              </button>
             </div>
 
             {/* Two-column body */}
@@ -267,16 +305,19 @@ function AppContent() {
         </div>
       } />
       <Route path="/tracestar" element={<TraceStar />} />
+      <Route path="/admin" element={<AdminPanel />} />
     </Routes>
   );
 }
 
 export default function App() {
   return (
-    <ThemeProvider>
-      <BrowserRouter>
-        <AppContent />
-      </BrowserRouter>
-    </ThemeProvider>
+    <BrowserRouter>
+      <AuthProvider>
+        <AuthGate>
+          <AppContent />
+        </AuthGate>
+      </AuthProvider>
+    </BrowserRouter>
   );
 }

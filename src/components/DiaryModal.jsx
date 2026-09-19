@@ -4,6 +4,7 @@ import {
     getSavedDirHandle, pickDirectory, verifyPermission,
     readDiary, writeDiary, createEmptyDiary, noteId, clearDirHandle,
 } from '../store/diaryStore.js';
+import { useAuth } from './AuthContext.jsx';
 
 // ---------------------------------------------------------------------------
 // Note color palette
@@ -100,6 +101,7 @@ function FolderBanner({ onPick, onRetry }) {
 // Main DiaryModal
 // ---------------------------------------------------------------------------
 export default function DiaryModal({ selectedDate, onClose }) {
+    const { user } = useAuth();
     const [fullscreen, setFullscreen] = useState(false);
     const [tab, setTab] = useState('main'); // 'main' | 'notes' (compact mode only)
 
@@ -115,17 +117,17 @@ export default function DiaryModal({ selectedDate, onClose }) {
     const dirRef = useRef(null);
     dirRef.current = dirHandle;
 
-    // ── Load directory handle on mount ──
+    // ── Load directory handle on mount (per account) ──
     useEffect(() => {
         (async () => {
-            const handle = await getSavedDirHandle();
+            const handle = await getSavedDirHandle(user.id);
             if (!handle) { setFsState('nodir'); return; }
             const ok = await verifyPermission(handle);
             if (!ok) { setFsState('nodir'); return; }
             setDirHandle(handle);
             setFsState('ready');
         })();
-    }, []);
+    }, [user.id]);
 
     // ── Load diary data when dir and date are ready ──
     useEffect(() => {
@@ -161,7 +163,7 @@ export default function DiaryModal({ selectedDate, onClose }) {
     }, [scheduleSave]);
 
     const handlePickDir = async () => {
-        const handle = await pickDirectory();
+        const handle = await pickDirectory(user.id, user.username);
         if (!handle) return;
         const ok = await verifyPermission(handle);
         if (ok) { setDirHandle(handle); setFsState('ready'); }
@@ -311,7 +313,7 @@ export default function DiaryModal({ selectedDate, onClose }) {
                             📁 {dirHandle?.name}
                         </span>
                         <button className="diary-footer-change" onClick={async () => {
-                            await clearDirHandle();
+                            await clearDirHandle(user.id);
                             setDirHandle(null);
                             setFsState('nodir');
                         }}>更换</button>

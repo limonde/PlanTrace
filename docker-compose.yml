@@ -1,0 +1,36 @@
+services:
+  plantrace:
+    build: .
+    restart: unless-stopped
+    environment:
+      PLANTRACE_PORT: "3000"
+      PLANTRACE_HOST: "0.0.0.0"
+      PLANTRACE_TRUST_PROXY: "1"
+      PLANTRACE_SETUP_TOKEN: "${PLANTRACE_SETUP_TOKEN:-}"
+    volumes:
+      # 持久化账号数据与备份，容器重建不丢数据
+      - plantrace-data:/app/data
+      - plantrace-backups:/app/backups
+    expose:
+      - "3000"
+
+  caddy:
+    image: caddy:2-alpine
+    restart: unless-stopped
+    depends_on:
+      - plantrace
+    ports:
+      - "80:80"
+      - "443:443"
+    environment:
+      DOMAIN: "${DOMAIN:?请在 .env 文件中设置 DOMAIN，例如 DOMAIN=plan.example.com}"
+    volumes:
+      - ./deploy/Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy-data:/data
+      - caddy-config:/config
+
+volumes:
+  plantrace-data:
+  plantrace-backups:
+  caddy-data:
+  caddy-config:

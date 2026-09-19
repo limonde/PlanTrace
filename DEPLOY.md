@@ -5,7 +5,9 @@
 必须提交：
 
 - `src/`
+- `server/`
 - `public/`
+- `.gitignore`
 - `index.html`
 - `package.json`
 - `package-lock.json`
@@ -26,6 +28,7 @@
 
 - `node_modules/`，客户电脑执行安装脚本后自动安装
 - `dist/`，这是构建产物，不是源码
+- `data/`，这是账号与业务数据，绝不能提交
 - `backups/`，这是本地个人数据备份
 
 可选提交：

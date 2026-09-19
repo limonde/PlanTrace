@@ -4,7 +4,8 @@
 >
 > A beautiful local-first task manager with atomic timer, diary, and weekly schedule visualization.
 
-![version](https://img.shields.io/badge/版本-v1.1.0-blueviolet)
+![version](https://img.shields.io/badge/版本-v1.3.0-blueviolet)
+![deploy](https://img.shields.io/badge/部署-Docker_·_云服务器-2496ed)
 ![react](https://img.shields.io/badge/React-19-61dafb)
 ![vite](https://img.shields.io/badge/Vite-7-646cff)
 ![tailwind](https://img.shields.io/badge/Tailwind_CSS-v4-06b6d4)
@@ -80,6 +81,18 @@
 
 3D 星空可视化，每颗星代表一个任务的投入历史——任务越活跃，星越亮。
 
+### 👤 多用户账号
+
+```
+账号系统
+├── 登录 / 注册      首个注册账号自动成为管理员
+├── 数据隔离         每个账号的任务、日志、专注记录独立存放在 data/<用户>/
+├── 用户管理后台     管理员可创建 / 禁用 / 删除账号、重置密码、设为管理员
+├── 注册开关         管理员可关闭自助注册，仅手动建号
+├── 日记隔离         每个账号使用独立的日记目录（自动创建 PlanTrace-<用户名> 子文件夹）
+└── 旧数据迁移       升级前浏览器里的旧数据会自动归入首个管理员账号
+```
+
 ### 🔔 版本更新
 
 ```
@@ -136,6 +149,23 @@ npm run dev
 
 ---
 
+---
+
+## ☁️ 云服务器部署（多人随时随地访问）
+
+除了本机使用，PlanTrace 也可以部署到云服务器：多人在任意设备登录，账号数据集中在服务器上按用户隔离。
+
+```bash
+# Docker + 自动 HTTPS（推荐，需要一个解析到服务器的域名）
+cp .env.example .env && vi .env     # 填 DOMAIN=plan.example.com
+docker compose up -d --build
+docker compose logs plantrace       # 查看首次注册所需的初始化令牌
+```
+
+- 完整步骤（Docker / 裸机 systemd / Nginx / 环境变量 / 安全清单）见 **[DEPLOY-CLOUD.md](DEPLOY-CLOUD.md)**
+- 公网安全：首次注册需初始化令牌、登录限流、HTTPS 下 Cookie Secure、数据目录不对外暴露
+- 多设备：同一账号多处登录时按条目 ID 合并数据，页面重新聚焦会自动拉取最新版本
+
 ## 🔄 更新
 
 | 方式 | 适用场景 |
@@ -149,7 +179,24 @@ npm run dev
 
 ## 🏗️ 数据架构（Event Sourcing）
 
-所有数据存储在浏览器 **LocalStorage**，严格分离为两个集合：
+账号与业务数据由服务端（`server/`，本地开发为 Vite 中间件，云端为 `server/index.js`）保存为 JSON 文件，按账号严格隔离：
+
+```
+data/
+├── users.json                # 账号（scrypt 加盐哈希密码）
+├── sessions.json             # 登录会话（HttpOnly Cookie）
+├── settings.json             # 注册开关
+└── users/<用户ID>/
+    ├── tasks.json            # 任务
+    ├── action_logs.json      # 动作日志
+    ├── atomic_sessions.json  # 原子专注记录
+    └── prefs.json            # 主题、弹窗偏好等
+```
+
+> [!NOTE]
+> 前端仍以原有同步 API 读写数据：登录后一次性载入内存缓存，改动以 500ms 防抖写回服务端；页面关闭时用 sendBeacon 兜底同步。
+
+任务与日志严格分离为两个集合：
 
 ### Tasks — 任务池
 
@@ -199,26 +246,46 @@ npm run dev
 ```
 PlanTrace/
 ├── index.html
-├── vite.config.js              # Vite + 备份/更新插件
+├── vite.config.js              # Vite + 更新插件
+├── .gitignore                  # 忽略 node_modules / data / backups
 ├── public/
 │   └── version.json            # 远端版本清单（推送后用于检测更新）
-├── backups/                    # 导出的 JSON 备份（自动创建）
+├── server/                     # 服务端（本地开发 / 云部署共用）
+│   ├── db.js                   # JSON 文件读写（原子写入）
+│   ├── auth.js                 # 账号 / 密码哈希 / 会话 / 初始化令牌
+│   ├── apiRouter.js            # /api/auth、/api/data、/api/backup、/api/update 路由
+│   ├── update.js               # 版本清单拉取 + 生产环境自更新
+│   ├── rateLimit.js            # 登录/注册限流
+│   ├── apiPlugin.js            # Vite 开发服务器接入
+│   └── index.js                # 生产服务器（静态托管 + API + SPA 回退）
+├── deploy/                     # 云部署配置（Caddyfile / systemd unit）
+├── Dockerfile                  # 多阶段构建镜像
+├── docker-compose.yml          # 应用 + Caddy 自动 HTTPS
+├── data/                       # 账号与业务数据（自动创建，勿提交）
+├── backups/                    # 导出的 JSON 备份（按账号分目录，自动创建）
 ├── Install-PlanTrace-From-GitHub.bat   # 一键安装
 ├── Update-PlanTrace.bat                # 一键更新
 ├── start.bat                           # 日常启动
 └── src/
     ├── version.js              # 本地版本常量
-    ├── App.jsx                 # 根组件 & 状态管理
+    ├── App.jsx                 # 根组件 & 路由 & 状态管理
     ├── index.css               # 设计系统（毛玻璃、渐变、动画）
+    ├── pages/
+    │   ├── AdminPanel.jsx      # 用户管理后台（仅管理员）
+    │   └── TraceStar/          # 3D 星图
     ├── store/
     │   ├── dateUtils.js        # 北京时间工具函数
     │   ├── storage.js          # LocalStorage 封装 + 导出备份
     │   ├── taskStore.js        # 任务 CRUD（每次操作追加 ActionLog）
     │   ├── actionLogStore.js   # 只追加的不可变日志
     │   ├── atomicStore.js      # 原子专注记录
-    │   ├── diaryStore.js       # 日记 File System Access API 封装
+    │   ├── authStore.js        # 账号 API + 登录后数据加载
+    │   ├── diaryStore.js       # 日记 File System Access API 封装（按账号隔离）
     │   └── versionStore.js     # 版本检测（远端拉取 + 超时 + 冷却）
     └── components/
+        ├── AuthContext.jsx     # 登录状态上下文
+        ├── AuthGate.jsx        # 未登录拦截 + 启动画面
+        ├── LoginScreen.jsx     # 登录 / 注册页
         ├── Sidebar.jsx         # 日期卡片、状态点、导航
         ├── Toolbar.jsx         # 日期标题 + 添加任务
         ├── TaskItem.jsx        # 任务行（图标、Hammer、编辑、删除）
@@ -257,7 +324,9 @@ PlanTrace/
 | 图标 | Lucide React |
 | 3D | Three.js + @react-three/fiber |
 | 动效 | Framer Motion |
-| 存储 | LocalStorage（Event Sourcing）+ File System Access API（日记） |
+| 服务端 | Node（本地= Vite 中间件，云= 生产 HTTP 服务）+ 文件型 JSON 存储 + scrypt 密码哈希 + HttpOnly Cookie 会话 |
+| 部署 | Docker / Docker Compose + Caddy 自动 HTTPS / systemd + Nginx |
+| 存储 | 服务端按账号隔离（Event Sourcing 数据模型）+ File System Access API（日记） |
 | 字体 | Inter（Google Fonts）|
 
 ---
@@ -266,14 +335,16 @@ PlanTrace/
 
 ```
 用户数据存储位置：
-├── 任务 / 日志 / 专注记录  →  浏览器 LocalStorage（只在 localhost:5173）
-├── 日记文件               →  用户自选本地文件夹（与项目目录无关）
-└── 导出备份               →  项目 backups/ 目录
-                               plantrace_backup_2026-09-19.json
+├── 账号 / 任务 / 日志 / 专注记录  →  项目 data/ 目录（按账号 ID 分子目录）
+├── 日记文件                      →  用户自选本地文件夹下的 PlanTrace-<用户名>/（与项目目录无关）
+└── 导出备份                      →  项目 backups/<用户名>/ 目录
+                                      plantrace_backup_2026-09-19.json
 ```
 
 > [!IMPORTANT]
-> 更新代码时，以上三处数据**均不会被覆盖或删除**。
+> 更新代码（应用内一键更新或重装脚本）时，`data/` 与 `backups/` **均不会被覆盖或删除**。
+>
+> 首次使用：第一个注册的账号自动成为管理员，并自动继承旧版本 LocalStorage 数据；之后可在右上角「用户管理」中创建其他账号。
 
 ---
 

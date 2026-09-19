@@ -1,0 +1,19 @@
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+
+# Local user data (accounts, tasks, diaries) — never commit
+data/
+backups/
+
+# Local deployment config (domains, setup tokens)
+.env
+
+# Logs / editor / OS
+*.log
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/

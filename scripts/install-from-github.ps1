@@ -70,10 +70,13 @@ try {
     }
 
     Write-Step "Installing to $installDir"
-    $existingBackups = Join-Path $installDir 'backups'
-    if (Test-Path -LiteralPath $existingBackups) {
-        New-Item -ItemType Directory -Force -Path $preserveDir | Out-Null
-        Copy-Item -LiteralPath $existingBackups -Destination (Join-Path $preserveDir 'backups') -Recurse -Force
+    # Preserve local user data across reinstalls: account data + manual backups
+    foreach ($preserveName in @('data', 'backups')) {
+        $existing = Join-Path $installDir $preserveName
+        if (Test-Path -LiteralPath $existing) {
+            New-Item -ItemType Directory -Force -Path $preserveDir | Out-Null
+            Copy-Item -LiteralPath $existing -Destination (Join-Path $preserveDir $preserveName) -Recurse -Force
+        }
     }
 
     if (Test-Path -LiteralPath $installDir) {
@@ -83,9 +86,11 @@ try {
     New-Item -ItemType Directory -Force -Path $installDir | Out-Null
     Get-ChildItem -LiteralPath $sourceDir.FullName -Force | Copy-Item -Destination $installDir -Recurse -Force
 
-    $preservedBackups = Join-Path $preserveDir 'backups'
-    if (Test-Path -LiteralPath $preservedBackups) {
-        Copy-Item -LiteralPath $preservedBackups -Destination $installDir -Recurse -Force
+    foreach ($preserveName in @('data', 'backups')) {
+        $preserved = Join-Path $preserveDir $preserveName
+        if (Test-Path -LiteralPath $preserved) {
+            Copy-Item -LiteralPath $preserved -Destination $installDir -Recurse -Force
+        }
     }
 
     $localInstaller = Join-Path $installDir 'scripts\install-local.ps1'

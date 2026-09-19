@@ -1,14 +1,14 @@
 {
-  "version": "1.1.1",
+  "version": "1.3.0",
   "releaseDate": "2026-09-19",
   "releaseNotes": [
-    "新增日记功能（每日主日记 + 碎碎念，本地文件夹存储）",
-    "新增周日程视图（HAMMER 记录 / 原子时间双模式，自适应时间范围）",
-    "原子时钟支持任意时长输入、历史记录面板、跨日期查看",
-    "界面优化：毛玻璃效果、颜色系统、按钮样式全面升级",
-    "修复日期切换时原子记录不显示的 Bug",
-    "修复 localhost vs 127.0.0.1 数据隔离问题",
-    "新增用户友好更新功能"
+    "支持云服务器部署：新增生产服务器 server/index.js（静态托管 + API + SPA 路由回退）",
+    "新增 Docker 部署：Dockerfile + docker-compose（内置 Caddy 自动 HTTPS），数据持久化到 Docker 卷",
+    "公网安全加固：首次注册需初始化令牌、登录/注册按 IP 限流、HTTPS 下 Cookie 自动 Secure、安全响应头",
+    "多设备同步：同一账号多处登录，数据按条目 ID 自动合并，不再整份覆盖",
+    "页面重新聚焦时自动拉取服务端最新数据",
+    "一键更新适配云部署：非 git 部署提示服务器端更新命令，git 部署可选开启 PLANTRACE_SELF_UPDATE",
+    "新增 .env.example、deploy/Caddyfile、deploy/plantrace.service 与云部署文档 DEPLOY-CLOUD.md"
   ],
   "downloadUrl": "https://github.com/EmoLorry/PlanTrace"
 }
