@@ -3043,3 +3043,325 @@
   cursor: not-allowed;
   box-shadow: none;
 }
+
+/* ═══════════════════════════════════════════════════════
+   MOBILE ADAPTATION (phones / touch devices)
+   ═══════════════════════════════════════════════════════ */
+
+/* Task row actions are hover-revealed on desktop; keep them visible on touch */
+@media (hover: none) {
+  .task-actions {
+    opacity: 1 !important;
+  }
+}
+
+@media (max-width: 768px) {
+  /* ── App shell: sidebar becomes a top strip, main scrolls below ── */
+  .app-shell {
+    flex-direction: column;
+    height: 100dvh;
+  }
+
+  .app-divider {
+    display: none;
+  }
+
+  .app-main {
+    padding: 10px 12px calc(20px + env(safe-area-inset-bottom));
+    height: auto;
+    min-height: 0;
+  }
+
+  .app-iconbar {
+    flex-wrap: wrap;
+    gap: 2px;
+    margin-bottom: 6px;
+    justify-content: flex-end;
+  }
+
+  .app-iconbar > button {
+    padding: 7px;
+  }
+
+  .app-user-chip {
+    max-width: 84px;
+    padding: 3px 8px;
+  }
+
+  /* ── Sidebar → horizontal date strip ── */
+  .app-sidebar {
+    width: 100%;
+    min-width: 100%;
+    height: auto;
+    flex-direction: row;
+    align-items: center;
+    gap: 6px;
+    padding: calc(8px + env(safe-area-inset-top)) 10px 8px;
+    flex-shrink: 0;
+    border-bottom: 1px solid var(--th-divider);
+  }
+
+  .sidebar-brand {
+    display: none;
+  }
+
+  .sidebar-nav {
+    flex-shrink: 0;
+    margin: 0;
+    padding: 0;
+  }
+
+  .sidebar-dates {
+    display: flex;
+    flex-direction: row;
+    gap: 6px;
+    flex: 1;
+    min-width: 0;
+    overflow-x: auto;
+    overflow-y: hidden;
+    padding: 2px 1px;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+
+  .sidebar-dates::-webkit-scrollbar {
+    display: none;
+  }
+
+  .sidebar-dates > * {
+    margin-top: 0;
+    margin-bottom: 0;
+  }
+
+  .sidebar-date-card {
+    width: 58px;
+    min-width: 58px;
+    padding: 6px 2px;
+    text-align: center;
+  }
+
+  .sidebar-date-main {
+    justify-content: center;
+    gap: 3px;
+    flex-wrap: wrap;
+  }
+
+  .sidebar-date-day {
+    font-size: 15px;
+  }
+
+  .sidebar-date-weekday {
+    font-size: 10px;
+  }
+
+  .sidebar-today-label,
+  .sidebar-pending {
+    display: none;
+  }
+
+  .sidebar-actions {
+    display: flex;
+    gap: 2px;
+    margin: 0;
+    flex-shrink: 0;
+  }
+
+  .sidebar-action {
+    width: 38px;
+    height: 38px;
+    padding: 0;
+    justify-content: center;
+  }
+
+  .sidebar-action-label {
+    display: none;
+  }
+
+  /* ── Main content: single column ── */
+  .main-page-grid {
+    flex-direction: column;
+    gap: 16px;
+    max-width: none;
+  }
+
+  .main-task-col {
+    width: 100%;
+  }
+
+  .main-atomic-col {
+    width: 100%;
+    padding-top: 0;
+    position: static;
+  }
+
+  .atomic-panel {
+    width: 100%;
+  }
+
+  .toolbar-date {
+    font-size: 19px;
+  }
+
+  /* Prevent iOS auto-zoom when focusing inputs */
+  .app-main input,
+  .app-main textarea,
+  .auth-input {
+    font-size: 16px;
+  }
+
+  /* ── Modals / overlays ── */
+  .diary-modal-compact {
+    width: calc(100vw - 16px);
+    max-height: 86vh;
+  }
+
+  .diary-modal-full {
+    inset: 0;
+    border-radius: 0;
+    height: 100dvh;
+  }
+
+  .hist-panel {
+    width: calc(100vw - 32px);
+    max-height: 78vh;
+  }
+
+  .upd-card {
+    max-height: 88vh;
+    overflow-y: auto;
+  }
+
+  .auth-overlay {
+    padding: 14px;
+  }
+
+  /* ── Week view: compact top bar + horizontally scrollable days ── */
+  .wv-topbar {
+    flex-wrap: wrap;
+    gap: 6px 10px;
+    padding: calc(8px + env(safe-area-inset-top)) 10px 8px;
+  }
+
+  .wv-topbar-left {
+    flex: 0 0 auto;
+  }
+
+  .wv-topbar-center {
+    order: 3;
+    width: 100%;
+  }
+
+  .wv-topbar-right {
+    flex: 0 0 auto;
+  }
+
+  .wv-range-hint {
+    display: none;
+  }
+
+  .wv-week-total {
+    font-size: 11px;
+  }
+
+  .wv-time-axis {
+    width: 38px;
+  }
+
+  .wv-scroll-outer {
+    overflow-x: auto;
+  }
+
+  .wv-days-area {
+    min-width: 620px;
+  }
+
+  /* ── Admin panel ── */
+  .admin-page {
+    padding: 14px 12px 48px;
+  }
+
+  .admin-header {
+    flex-wrap: wrap;
+  }
+
+  .admin-title {
+    font-size: 17px;
+  }
+
+  /* ── TraceStar HUD ── */
+  .trace-hud-row {
+    padding: 12px;
+  }
+
+  .trace-title {
+    font-size: 20px;
+  }
+
+  .trace-subtitle {
+    display: none;
+  }
+
+  .trace-filter-card {
+    min-width: 0;
+    width: 168px;
+    padding: 10px;
+    gap: 8px;
+  }
+
+  /* ── Icon bar / theme dropdown / admin table refinements ── */
+  .edge-toggle-btn {
+    display: none;
+  }
+
+  .theme-panel {
+    position: fixed;
+    left: 10px;
+    right: 10px;
+    bottom: 10px;
+    top: auto;
+    width: auto;
+    max-width: none;
+    max-height: 72vh;
+    overflow-y: auto;
+  }
+
+  .admin-table th,
+  .admin-table td {
+    padding: 8px 6px;
+    font-size: 12px;
+  }
+
+  .admin-role,
+  .admin-status {
+    white-space: nowrap;
+  }
+
+  .admin-col-stats {
+    display: none;
+  }
+
+  .trace-hint-list {
+    display: none;
+  }
+
+  .trace-filter-card select {
+    font-size: 12px;
+    padding: 6px 8px;
+  }
+}
+
+/* Very narrow phones (iPhone SE etc.) */
+@media (max-width: 380px) {
+  .app-user-chip {
+    display: none;
+  }
+
+  .sidebar-date-card {
+    width: 52px;
+    min-width: 52px;
+  }
+
+  .trace-filter-card {
+    width: 150px;
+  }
+}

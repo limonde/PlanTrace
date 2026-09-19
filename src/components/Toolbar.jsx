@@ -27,7 +27,7 @@ export default function Toolbar({ selectedDate, onAddTask }) {
             {/* Date Display */}
             <div className="flex items-center justify-between mb-5">
                 <div>
-                    <h2 className="text-2xl font-semibold text-text-primary tracking-tight">
+                    <h2 className="toolbar-date text-2xl font-semibold text-text-primary tracking-tight">
                         {getFullDateDisplay(selectedDate)}
                     </h2>
                     {isToday(selectedDate) && (

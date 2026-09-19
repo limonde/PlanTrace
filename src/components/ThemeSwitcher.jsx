@@ -190,7 +190,7 @@ export default function ThemeSwitcher() {
 
             {isOpen && (
                 <div
-                    className="absolute right-0 top-full mt-2 w-[380px] max-w-[calc(100vw-24px)] glass p-2 animate-drop-in z-50"
+                    className="theme-panel absolute right-0 top-full mt-2 w-[380px] max-w-[calc(100vw-24px)] glass p-2 animate-drop-in z-50"
                     style={{ background: 'var(--th-modal-bg)', backdropFilter: 'blur(24px) saturate(200%)' }}
                 >
                     <div className="flex items-center justify-between gap-3 px-2 py-1.5">

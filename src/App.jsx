@@ -153,21 +153,21 @@ function AppContent() {
   return (
     <Routes>
       <Route path="/" element={
-        <div className="h-full w-full flex">
+        <div className="app-shell h-full w-full flex">
           <Sidebar
             selectedDate={selectedDate}
             onDateSelect={handleDateSelect}
             onPlanFuture={() => setShowPlanFuture(true)}
           />
 
-          <div className="w-px my-6" style={{ background: 'var(--th-divider)' }} />
+          <div className="app-divider w-px my-6" style={{ background: 'var(--th-divider)' }} />
 
           {/* Page Edge Vignette Glow */}
           {showEdge && <div className="page-edge-glow" />}
 
-          <main className="flex-1 h-full overflow-y-auto py-6 px-8 relative">
+          <main className="app-main flex-1 h-full overflow-y-auto py-6 px-8 relative">
             {/* Top-right icon controls */}
-            <div className="flex items-center justify-end gap-1 mb-2">
+            <div className="app-iconbar flex items-center justify-end gap-1 mb-2">
               <button
                 onClick={handleCheckUpdate}
                 className="p-2 rounded-xl hover:bg-[var(--th-hover)] transition-all text-text-muted hover:text-sky-400"
@@ -203,7 +203,7 @@ function AppContent() {
                   setShowEdge(next);
                   setJSON('show_edge', next);
                 }}
-                className={`p-2 rounded-xl hover:bg-[var(--th-hover)] transition-all
+                className={`edge-toggle-btn p-2 rounded-xl hover:bg-[var(--th-hover)] transition-all
               ${showEdge ? 'text-accent' : 'text-text-muted'}`}
                 title={showEdge ? 'Hide edge glow' : 'Show edge glow'}
               >

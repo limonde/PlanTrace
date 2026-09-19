@@ -193,7 +193,7 @@ export default function AdminPanel() {
                                     <th>角色</th>
                                     <th>状态</th>
                                     <th>创建时间</th>
-                                    <th>任务 / 日志 / 专注</th>
+                                    <th className="admin-col-stats">任务 / 日志 / 专注</th>
                                     <th style={{ textAlign: 'right' }}>操作</th>
                                 </tr>
                             </thead>
@@ -215,7 +215,7 @@ export default function AdminPanel() {
                                                 : <span className="admin-status admin-status-on">正常</span>}
                                         </td>
                                         <td className="admin-muted">{formatDate(u.createdAt)}</td>
-                                        <td className="admin-muted">
+                                        <td className="admin-muted admin-col-stats">
                                             {u.stats ? `${u.stats.tasks} / ${u.stats.logs} / ${u.stats.sessions}` : '—'}
                                         </td>
                                         <td className="admin-actions">

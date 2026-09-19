@@ -364,8 +364,8 @@ export default function ThreeDTraceView() {
 
             {/* Tactile UI Overlay */}
             <div className="absolute top-0 w-full h-full z-10 pointer-events-none">
-                <div className="absolute top-0 w-full p-6 flex justify-between items-start">
-                    <div className="space-y-2 pointer-events-auto">
+                <div className="trace-hud-row absolute top-0 w-full p-6 flex justify-between items-start">
+                    <div className="trace-hud-left space-y-2 pointer-events-auto">
                         <button
                             onClick={() => navigate('/')}
                             className="group flex items-center gap-2 px-4 py-2 rounded-xl bg-surface/20 hover:bg-surface/50 border border-divider/10 hover:border-divider/30 backdrop-blur-md transition-all text-text-muted hover:text-text-primary"
@@ -374,14 +374,14 @@ export default function ThreeDTraceView() {
                             <span className="font-semibold tracking-wide">Return</span>
                         </button>
                         <div className="pl-2 pt-2">
-                            <h1 className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-indigo-400 to-purple-400 drop-shadow-sm">
+                            <h1 className="trace-title text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-indigo-400 to-purple-400 drop-shadow-sm">
                                 TraceStar
                             </h1>
-                            <p className="text-xs text-text-muted tracking-widest uppercase mt-1">Constellation Engine</p>
+                            <p className="trace-subtitle text-xs text-text-muted tracking-widest uppercase mt-1">Constellation Engine</p>
                         </div>
                     </div>
 
-                    <div className="pointer-events-auto bg-surface/40 backdrop-blur-xl border border-divider/50 rounded-2xl p-4 shadow-2xl flex flex-col gap-3 min-w-[200px]">
+                    <div className="trace-filter-card pointer-events-auto bg-surface/40 backdrop-blur-xl border border-divider/50 rounded-2xl p-4 shadow-2xl flex flex-col gap-3 min-w-[200px]">
                         <div className="flex items-center gap-2 text-text-secondary text-sm font-medium">
                             <Calendar size={16} className="text-accent" />
                             <span>Time Compass</span>
@@ -412,7 +412,7 @@ export default function ThreeDTraceView() {
                                 </div>
                             ))}
                         </div>
-                        <div className="pt-2 border-t border-divider/30 text-[10px] text-text-muted flex flex-col gap-1">
+                        <div className="trace-hint-list pt-2 border-t border-divider/30 text-[10px] text-text-muted flex flex-col gap-1">
                             <div className="flex justify-between"><span>L-Click:</span> <span className="text-text-secondary">Hammer</span></div>
                             <div className="flex justify-between"><span>R-Click:</span> <span className="text-text-secondary">Focus</span></div>
                             <div className="flex justify-between"><span>Space:</span> <span className="text-text-secondary">Reset View</span></div>

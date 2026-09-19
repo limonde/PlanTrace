@@ -311,7 +311,7 @@ export default function TaskItem({ task, selectedDate, onComplete, onEditContent
             </div>
 
             {/* Actions */}
-            <div className={`flex items-center gap-0.5 transition-opacity ${isTimerOn ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'}`}>
+            <div className={`task-actions flex items-center gap-0.5 transition-opacity ${isTimerOn ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'}`}>
                 {isPending && isTodayDate && (
                     <>
                         {/* Live timer display */}
