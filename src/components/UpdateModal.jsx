@@ -1,7 +1,7 @@
 import { useState, useRef } from 'react';
 import { X, Download, RefreshCw, ChevronRight, Sparkles, CheckCircle2, AlertCircle, Loader } from 'lucide-react';
 import { APP_VERSION, dismissVersion } from '../store/versionStore.js';
-import { useAuth } from './AuthContext.jsx';
+import { useAuth } from './authContext.js';
 
 /**
  * UpdateModal

@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { BrowserRouter, Routes, Route, useNavigate } from 'react-router-dom';
-import { AuthProvider, useAuth } from './components/AuthContext.jsx';
+import { AuthProvider } from './components/AuthContext.jsx';
+import { useAuth } from './components/authContext.js';
 import AuthGate from './components/AuthGate.jsx';
 import AdminPanel from './pages/AdminPanel.jsx';
 import ThemeSwitcher from './components/ThemeSwitcher.jsx';

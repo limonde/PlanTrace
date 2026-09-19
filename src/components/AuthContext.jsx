@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useEffect, useCallback, useMemo } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import {
     fetchAuthConfig,
     fetchMe,
@@ -10,8 +10,7 @@ import {
 } from '../store/authStore.js';
 import { resetUserData } from '../store/storage.js';
 import { clearActiveSessionSS } from '../store/atomicStore.js';
-
-const AuthContext = createContext(null);
+import { AuthContext } from './authContext.js';
 
 export function AuthProvider({ children }) {
     const [user, setUser] = useState(null);
@@ -91,10 +90,4 @@ export function AuthProvider({ children }) {
     }), [user, config, bootState, login, register, logout, setAllowRegistration]);
 
     return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
-}
-
-export function useAuth() {
-    const ctx = useContext(AuthContext);
-    if (!ctx) throw new Error('useAuth must be used within AuthProvider');
-    return ctx;
 }

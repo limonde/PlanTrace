@@ -4,7 +4,7 @@ import {
     getSavedDirHandle, pickDirectory, verifyPermission,
     readDiary, writeDiary, createEmptyDiary, noteId, clearDirHandle,
 } from '../store/diaryStore.js';
-import { useAuth } from './AuthContext.jsx';
+import { useAuth } from './authContext.js';
 
 // ---------------------------------------------------------------------------
 // Note color palette

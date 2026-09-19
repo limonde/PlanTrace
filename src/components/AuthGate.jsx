@@ -1,4 +1,4 @@
-import { useAuth } from './AuthContext.jsx';
+import { useAuth } from './authContext.js';
 import { ThemeProvider } from './ThemeContext.jsx';
 import LoginScreen from './LoginScreen.jsx';
 import { Atom } from 'lucide-react';

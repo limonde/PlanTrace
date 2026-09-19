@@ -4,7 +4,7 @@ import {
     ArrowLeft, UserPlus, ShieldCheck, ShieldOff, KeyRound, Trash2,
     Ban, CheckCircle2, Loader, RefreshCw, Users, ToggleLeft, ToggleRight,
 } from 'lucide-react';
-import { useAuth } from '../components/AuthContext.jsx';
+import { useAuth } from '../components/authContext.js';
 import { listUsers, createUser, updateUser, deleteUser } from '../store/authStore.js';
 
 function formatDate(ms) {
