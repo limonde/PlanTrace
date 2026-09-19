@@ -14,9 +14,9 @@ import { APP_VERSION } from '../version.js';
 // ---------------------------------------------------------------------------
 const REMOTE_URLS = [
     '/api/update/check',
-    'https://raw.githubusercontent.com/EmoLorry/PlanTrace/main/public/version.json',
-    'https://cdn.jsdelivr.net/gh/EmoLorry/PlanTrace@main/public/version.json',
-    'https://api.github.com/repos/EmoLorry/PlanTrace/contents/public/version.json?ref=main',
+    'https://raw.githubusercontent.com/limonde/PlanTrace/main/public/version.json',
+    'https://cdn.jsdelivr.net/gh/limonde/PlanTrace@main/public/version.json',
+    'https://api.github.com/repos/limonde/PlanTrace/contents/public/version.json?ref=main',
 ];
 
 const TIMEOUT_MS       = 5000;  // abort fetch if no response in 5s

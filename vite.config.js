@@ -224,8 +224,8 @@ function updatePlugin() {
           // ── Step 1: Download ZIP ──
           send({ type: 'step', step: 1, message: '正在从 GitHub 下载最新版本...' });
           const ZIP_URLS = [
-            'https://codeload.github.com/EmoLorry/PlanTrace/zip/refs/heads/main',
-            'https://github.com/EmoLorry/PlanTrace/archive/refs/heads/main.zip',
+            'https://codeload.github.com/limonde/PlanTrace/zip/refs/heads/main',
+            'https://github.com/limonde/PlanTrace/archive/refs/heads/main.zip',
           ];
           const usedZipUrl = await downloadFirstAvailable(ZIP_URLS, zipPath, send);
           send({ type: 'progress', message: `下载通道: ${usedZipUrl}` });

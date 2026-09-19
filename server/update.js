@@ -40,15 +40,15 @@ export async function fetchRemoteVersionManifest() {
   const sources = [
     {
       kind: 'json',
-      url: `https://raw.githubusercontent.com/EmoLorry/PlanTrace/main/public/version.json?${cacheBust}`,
+      url: `https://raw.githubusercontent.com/limonde/PlanTrace/main/public/version.json?${cacheBust}`,
     },
     {
       kind: 'json',
-      url: `https://cdn.jsdelivr.net/gh/EmoLorry/PlanTrace@main/public/version.json?${cacheBust}`,
+      url: `https://cdn.jsdelivr.net/gh/limonde/PlanTrace@main/public/version.json?${cacheBust}`,
     },
     {
       kind: 'github-content',
-      url: `https://api.github.com/repos/EmoLorry/PlanTrace/contents/public/version.json?ref=main&${cacheBust}`,
+      url: `https://api.github.com/repos/limonde/PlanTrace/contents/public/version.json?ref=main&${cacheBust}`,
     },
   ];
 

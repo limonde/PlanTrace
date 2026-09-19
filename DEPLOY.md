@@ -47,7 +47,7 @@
 
 1. 把 `Install-PlanTrace-From-GitHub.bat` 发给客户。
 2. 客户双击运行。
-3. 脚本会从 `https://github.com/EmoLorry/PlanTrace` 的 `main` 分支下载最新源码，安装到 `%LOCALAPPDATA%\PlanTrace`，创建桌面快捷方式并启动。
+3. 脚本会从 `https://github.com/limonde/PlanTrace` 的 `main` 分支下载最新源码，安装到 `%LOCALAPPDATA%\PlanTrace`，创建桌面快捷方式并启动。
 
 ## 客户电脑要求
 

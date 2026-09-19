@@ -130,7 +130,7 @@
 
 ```bash
 # 1. 克隆仓库
-git clone https://github.com/EmoLorry/PlanTrace.git
+git clone https://github.com/limonde/PlanTrace.git
 cd PlanTrace
 
 # 2. 安装依赖

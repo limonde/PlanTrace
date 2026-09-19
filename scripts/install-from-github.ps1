@@ -1,5 +1,5 @@
 param(
-    [string]$RepoOwner = 'EmoLorry',
+    [string]$RepoOwner = 'limonde',
     [string]$RepoName = 'PlanTrace',
     [string]$Branch = 'main',
     [string]$InstallRoot = $env:LOCALAPPDATA,

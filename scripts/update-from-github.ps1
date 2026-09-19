@@ -1,6 +1,6 @@
 param(
     [string]$ProjectDir = (Resolve-Path (Join-Path $PSScriptRoot '..')).Path,
-    [string]$RepoOwner = 'EmoLorry',
+    [string]$RepoOwner = 'limonde',
     [string]$RepoName = 'PlanTrace',
     [string]$Branch = 'main',
     [switch]$Yes,

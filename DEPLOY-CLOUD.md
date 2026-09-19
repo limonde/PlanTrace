@@ -13,7 +13,7 @@
 curl -fsSL https://get.docker.com | sh
 
 # 2. 获取代码
-git clone https://github.com/EmoLorry/PlanTrace.git
+git clone https://github.com/limonde/PlanTrace.git
 cd PlanTrace
 
 # 3. 配置域名
@@ -57,7 +57,7 @@ docker run --rm -v plantrace-data:/data -v "$PWD":/backup alpine \
 ```bash
 # 1. 获取代码并构建
 sudo mkdir -p /opt/plantrace && sudo chown "$USER" /opt/plantrace
-git clone https://github.com/EmoLorry/PlanTrace.git /opt/plantrace
+git clone https://github.com/limonde/PlanTrace.git /opt/plantrace
 cd /opt/plantrace
 npm ci
 npm run build
